@@ -1,15 +1,14 @@
 
-package com.activities.group.ML;
-
+package com.activities.group.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
-public class Result <T>{
+public class Result {
         @JsonIgnore
     public boolean correct;
     public int status;
     public String  errorMessage;
-    public T  object;
+    public Object  object;
     public Exception ex;
 }
 
