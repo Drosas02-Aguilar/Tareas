@@ -12,7 +12,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface ITarea extends JpaRepository<Tarea, Integer> {
     
-    List<Tarea> findByUsuario(Usuario usuario);
+ @Query("SELECT t FROM Tarea t WHERE t.usuario.idUsuario = :idUsuario")
+    List<Tarea> findByUsuarioId(@Param("idUsuario") int idUsuario);
     
     @Query("SELECT t FROM Tarea t WHERE t.idTarea = :idTarea AND t.usuario.idUsuario = :idUsuario")
 Optional<Tarea> findOwnedById(@Param("idTarea") int idTarea, @Param("idUsuario") int idUsuario);

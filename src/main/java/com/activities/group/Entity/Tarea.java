@@ -1,5 +1,7 @@
 package com.activities.group.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -36,6 +38,7 @@ public class Tarea {
      
     @ManyToOne
     @JoinColumn(name = "idusuario")
+    @JsonBackReference
     public Usuario usuario;
 
     public enum EstadoTarea {

@@ -37,11 +37,7 @@ public class TareaService {
     }
 
     public List<Tarea> ListarTareasPorUsuario(int idUsuario) {
-        Optional<Usuario> usuarioOptional = iUsuario.findById(idUsuario);
-        if (usuarioOptional.isPresent()) {
-            return iTarea.findByUsuario(usuarioOptional.get());
-        }
-        return List.of();
+        return iTarea.findByUsuarioId(idUsuario);
     }
 
     @Transactional
