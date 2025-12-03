@@ -105,16 +105,22 @@ public class RestControllerUsuario {
         return ResponseEntity.status(result.status).body(result);
     }
 
-    @PutMapping("/actualizar/{id}")
+    @PutMapping("/actualizar/{idUsuario}")
     public ResponseEntity ActualizarUsuario(@PathVariable int idUsuario, @RequestBody Usuario usuarioUpdate) {
         Result result = new Result();
         try {
             if (usuarioUpdate != null) {
-                result.object = usuarioService.ActualizarUsuario(idUsuario, usuarioUpdate);
-                result.status = 200;
+                Usuario actualizado = usuarioService.ActualizarUsuario(idUsuario, usuarioUpdate);
+                if (actualizado != null) {
+                    result.object = actualizado;
+                    result.status = 200;
+                } else {
+                    result.status = 404;
+                    result.errorMessage = "Usuario no encontrado.";
+                }
             } else {
                 result.status = 400;
-                result.errorMessage = "Usuario no encontradol";
+                result.errorMessage = "Datos de usuario inválidos.";
             }
         } catch (Exception ex) {
             result.status = 500;

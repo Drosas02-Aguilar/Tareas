@@ -33,8 +33,6 @@ public class Usuario {
     @Column(name ="password", length = 200, nullable = false, unique = true)
     private String password;
     
-    @Column(name="roles", nullable = false, length = 50)
-    private String roles = "ROLE_USER";
     
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private Set<Tarea> tareas;
@@ -81,13 +79,7 @@ public class Usuario {
         this.password = password;
     }
 
-    public String getRoles() {
-        return roles;
-    }
-
-    public void setRoles(String roles) {
-        this.roles = roles;
-    }
+   
 
     public Set<Tarea> getTareas() {
         return tareas;

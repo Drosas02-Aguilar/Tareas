@@ -21,7 +21,7 @@ public class Tarea {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="idTarea")
+    @Column(name="idtarea")
     private int idTarea;
     @Column(name="titulo", nullable = false)
     private String titulo;
@@ -35,8 +35,8 @@ public class Tarea {
     private EstadoTarea estado = EstadoTarea.INICIADA;
      
     @ManyToOne
-    @JoinColumn(name = "idUsuario")
-    private Usuario usuario;
+    @JoinColumn(name = "idusuario")
+    public Usuario usuario;
 
     public enum EstadoTarea {
         INICIADA, PENDIENTE, COMPLETADA
