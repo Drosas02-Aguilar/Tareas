@@ -31,6 +31,8 @@ public class UsuarioService {
         if (iUsuario.findByUsername(usuario.getUsername()).isPresent()) {
             return null;
         }
+        
+        usuario.setPassword(encoder.encode(usuario.getPassword()));
         iUsuario.save(usuario);
         return usuario;
 
