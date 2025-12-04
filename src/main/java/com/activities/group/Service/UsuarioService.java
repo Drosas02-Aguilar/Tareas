@@ -6,6 +6,7 @@ import com.activities.group.Entity.Usuario;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,9 @@ public class UsuarioService {
 
     @Autowired
     private ITarea iTarea;
+    
+   @Autowired
+   private PasswordEncoder encoder;
 
     @Transactional
     public Usuario CrearCuenta(Usuario usuario) {
