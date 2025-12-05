@@ -30,7 +30,7 @@ public class VerificationService {
         tokens.put(token, new TokenInfo(usuario.getIdUsuario(), expiry));
 
         String body = emailTemplates.activacionCuenta(usuario, token);
-        emailService.SendEmail(usuario.getEmail(), "Activación de cuenta", body);
+        emailService.sendHtmlEmail(usuario.getEmail(), "Activación de cuenta", body);
     }
 
     public boolean verifyAccount(String token) {

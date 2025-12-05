@@ -12,7 +12,7 @@ public class NotificationService {
     @Autowired private EmailService emailService;
     
     public void sendpasswordChangeNotification(Usuario usuario){
-    emailService.SendEmail(usuario.getEmail(),
+    emailService.sendHtmlEmail(usuario.getEmail(),
             "Contraseña actualizada",
             "Tu contraseña ha sido cambiada exitosamentee. si no fuiste tu, contacta a soporte"
             );

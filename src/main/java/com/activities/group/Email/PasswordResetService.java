@@ -29,7 +29,7 @@ public class PasswordResetService {
             resetTokens.put(token, usuario.getIdUsuario());
 
             String link = "http://localhost:8080/api/auth/reset?token=" + token;
-            emailService.SendEmail(email,
+            emailService.sendHtmlEmail(email,
                     "Recuperar contraseña",
                     "Haz clic en el siguiente enlace para restablecer tu contraseña: " + link);
         }

@@ -97,7 +97,7 @@ public class AuthController {
 
             if (creado != null) {
                 String body = emailTemplates.registroUsuario(creado, rawPassword);
-                emailService.SendEmail(creado.getEmail(), "Registro exitoso", body);
+                emailService.sendHtmlEmail(creado.getEmail(), "Registro exitoso", body);
                 result.object = "Usuario registrado. Revisa tu correo para verificar";
                 result.status = 201;
 
