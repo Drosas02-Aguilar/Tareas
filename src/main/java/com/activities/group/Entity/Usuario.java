@@ -1,4 +1,3 @@
-
 package com.activities.group.Entity;
 
 import jakarta.persistence.CascadeType;
@@ -11,33 +10,32 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.Set;
 
-
 @Entity
-@Table(name="USUARIO")
+@Table(name = "USUARIO")
 public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="idusuario")
+    @Column(name = "idusuario")
     private int idUsuario;
-    
-    @Column(name="nombre", length = 120, nullable = false)
+
+    @Column(name = "nombre", length = 120, nullable = false)
     private String nombre;
-    
-    @Column(name="username", length = 120, nullable = false)
+
+    @Column(name = "username", length = 120, nullable = false)
     private String username;
-    
-    @Column(name="email", length = 200, nullable = false, unique = true)
+
+    @Column(name = "email", length = 200, nullable = false, unique = true)
     private String email;
-    
-    @Column(name ="password", length = 200, nullable = false, unique = true)
+
+    @Column(name = "password", length = 200, nullable = false, unique = true)
     private String password;
-    
-    
+
+    @Column(name = "enabled")
+    private boolean enabled = false;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private Set<Tarea> tareas;
-    
-    
 
     public int getIdUsuario() {
         return idUsuario;
@@ -79,8 +77,6 @@ public class Usuario {
         this.password = password;
     }
 
-   
-
     public Set<Tarea> getTareas() {
         return tareas;
     }
@@ -88,6 +84,8 @@ public class Usuario {
     public void setTareas(Set<Tarea> tareas) {
         this.tareas = tareas;
     }
+
     
-    
+    public boolean isEnabled() { return enabled; }
+public void setEnabled(boolean enabled) { this.enabled = enabled; }
 }
