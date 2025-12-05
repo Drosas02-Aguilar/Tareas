@@ -1,11 +1,13 @@
 package com.activities.group.RestController;
 
+import com.activities.group.Email.EmailService;
 import com.activities.group.Email.NotificationService;
 import com.activities.group.Email.PasswordResetService;
 import com.activities.group.Email.VerificationService;
 import com.activities.group.Entity.Result;
 import com.activities.group.Entity.Usuario;
 import com.activities.group.Service.UsuarioService;
+import com.activities.group.desingEmail.EmailTemplates;
 import com.activities.group.jwt.JwtUtil;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +42,13 @@ public class AuthController {
     private PasswordResetService passwordResetService;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private EmailTemplates emailTemplates;
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private PasswordEncoder encoder;
 
 //    @PostMapping("/login")
 //    public ResponseEntity login(@RequestBody Usuario usuario) {
@@ -80,9 +90,14 @@ public class AuthController {
 
         try {
 
+            String rawPassword = usuario.getPassword();
+
+            usuario.setPassword(encoder.encode(rawPassword));
             Usuario creado = usuarioService.CrearCuenta(usuario);
+
             if (creado != null) {
-                verificationService.sendVerificationEmail(creado);
+                String body = emailTemplates.registroUsuario(creado, rawPassword);
+                emailService.SendEmail(creado.getEmail(), "Registro exitoso", body);
                 result.object = "Usuario registrado. Revisa tu correo para verificar";
                 result.status = 201;
 
@@ -134,12 +149,19 @@ public class AuthController {
         try {
 
             Usuario usuarioBuscar = usuarioService.BuscarPorUsuario(usuario.getUsername());
-            if (usuarioBuscar == null || !usuarioBuscar.isEnabled()) {
+            if (usuarioBuscar == null) {
 
-                result.status = 403;
-                result.errorMessage = "Cuenta no verificada";
+                result.status = 404;
+                result.errorMessage = "usuario no encontrado";
                 return ResponseEntity.status(result.status).body(result);
 
+            }
+
+            if (!usuarioBuscar.isEnabled()) {
+                verificationService.sendActivationEmail(usuarioBuscar);
+                result.status = 403;
+                result.errorMessage = "Cuenta no activada. Se envio un correo de activacion";
+                return ResponseEntity.status(result.status).body(result);
             }
 
             Authentication auth = authManager.authenticate(
@@ -175,7 +197,7 @@ public class AuthController {
     }
 
     @PostMapping("/reset")
-    public ResponseEntity resetPassword(@RequestParam String token,@RequestParam  String newPassword) {
+    public ResponseEntity resetPassword(@RequestParam String token, @RequestParam String newPassword) {
         Result result = new Result();
         try {
             boolean reset = passwordResetService.resetPassword(token, newPassword);
@@ -192,8 +214,7 @@ public class AuthController {
         }
         return ResponseEntity.status(result.status).body(result);
     }
-    
-    
+
     @PostMapping("/change-password")
     public ResponseEntity changePassword(@RequestParam String username,
             @RequestParam String newPassword) {
