@@ -309,7 +309,7 @@ public ResponseEntity changePassword(@RequestParam String username,
     try {
         Usuario usuario = usuarioService.BuscarPorUsuario(username);
         if (usuario != null) {
-            usuarioService.cambiarPassword(.usuario, newPassword);
+            usuarioService.cambiarPassword(usuario, newPassword);
             notificationService.sendpasswordChangeNotification(usuario);
 
             result.status = 200;
