@@ -2,6 +2,7 @@ package com.activities.group.Email;
 
 import com.activities.group.DAO.IUsuario;
 import com.activities.group.Entity.Usuario;
+import com.activities.group.desingEmail.EmailTemplates;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,6 +21,11 @@ public class PasswordResetService {
     private IUsuario iUsuario;
     @Autowired
     private PasswordEncoder encoder;
+    
+    @Autowired
+    private EmailTemplates emailTemplates;
+    
+    
 
     public void sendResetLink(String email) {
 
@@ -28,28 +34,31 @@ public class PasswordResetService {
             String token = UUID.randomUUID().toString();
             resetTokens.put(token, usuario.getIdUsuario());
 
-            String link = "http://localhost:8080/api/auth/reset?token=" + token;
-            emailService.sendHtmlEmail(email,
-                    "Recuperar contraseña",
-                    "Haz clic en el siguiente enlace para restablecer tu contraseña: " + link);
+           String htmlBody = emailTemplates.recuperarPassword(usuario, token);
+            emailService.sendHtmlEmail(email, "Recuperar contraseña", htmlBody);
+            
         }
 
     }
 
     public boolean resetPassword(String token, String newPassword) {
-
-        Integer idUsuario = resetTokens.remove(token);
-        if (idUsuario != null) {
-            Usuario usuario = iUsuario.findById(idUsuario).orElse(null);
-            if (usuario != null) {
-                usuario.setPassword(encoder.encode(newPassword));
-            }
+    Integer idUsuario = resetTokens.remove(token);
+    if (idUsuario != null) {
+        Usuario usuario = iUsuario.findById(idUsuario).orElse(null);
+        if (usuario != null) {
+            // Guardar la contraseña cifrada en BD
+            usuario.setPassword(encoder.encode(newPassword));
             iUsuario.save(usuario);
+
+            // Notificar al usuario con la nueva contraseña en texto plano
+            String htmlBody = emailTemplates.resentPasswordConfirm(usuario, newPassword);
+            emailService.sendHtmlEmail(usuario.getEmail(), "Tu contraseña ha sido restablecida", htmlBody);
+
             return true;
-
         }
-
-        return false;
     }
+    return false;
+}
+
 
 }

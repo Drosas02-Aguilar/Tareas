@@ -69,8 +69,9 @@ public class UsuarioService {
             usuario.setNombre(usuarioUpdate.getNombre());
             usuario.setUsername(usuarioUpdate.getUsername());
             usuario.setEmail(usuarioUpdate.getEmail());
-            usuario.setPassword(usuarioUpdate.getPassword());
-            iUsuario.save(usuario);
+if (usuarioUpdate.getPassword() != null && !usuarioUpdate.getPassword().isBlank()) {
+                usuario.setPassword(encoder.encode(usuarioUpdate.getPassword()));
+            }            iUsuario.save(usuario);
             return usuario;
         }
         return null;
@@ -89,6 +90,12 @@ public class UsuarioService {
 
         return null;
 
+    }
+    
+     @Transactional
+    public void cambiarPassword(Usuario usuario, String newPassword) {
+        usuario.setPassword(encoder.encode(newPassword));
+        iUsuario.save(usuario);
     }
 
 }

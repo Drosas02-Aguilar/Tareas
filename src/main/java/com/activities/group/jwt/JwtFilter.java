@@ -31,7 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = header.substring(7);
             try {
                 if (jwtUtil.isValid(token)) {
-                    String username = jwtUtil.extracUsername(token);
+                    String username = jwtUtil.extractUsername(token);
 
                     UserDetails userDetails = usuarioDetalleServicio.loadUserByUsername(username);
 
@@ -47,6 +47,6 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-    }
+        }
 
 }

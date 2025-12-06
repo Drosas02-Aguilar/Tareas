@@ -23,6 +23,7 @@ public class UsuarioDetalleServicio implements UserDetailsService{
         return  User.withUsername(usuario.getUsername())
                 .password(usuario.getPassword())
                 .authorities("USER") 
+                .disabled(!usuario.isEnabled())
                 .build();
     }
     

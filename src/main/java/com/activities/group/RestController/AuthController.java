@@ -84,38 +84,69 @@ public class AuthController {
 //        }
 //        return ResponseEntity.status(result.status).body(result);
 //    }
+//    @PostMapping("/register")
+//    public ResponseEntity register(@RequestBody Usuario usuario) {
+//        Result result = new Result();
+//
+//        try {
+//
+//            String rawPassword = usuario.getPassword();
+//
+//            usuario.setPassword(encoder.encode(rawPassword));
+//            Usuario creado = usuarioService.CrearCuenta(usuario);
+//
+//            if (creado != null) {
+//                String body = emailTemplates.registroUsuario(creado, rawPassword);
+//                emailService.sendHtmlEmail(creado.getEmail(), "Registro exitoso", body);
+//                result.object = "Usuario registrado. Revisa tu correo para verificar";
+//                result.status = 201;
+//
+//            } else {
+//                result.status = 400;
+//                result.errorMessage = "No se pudo registrar el usuario";
+//
+//            }
+//
+//        } catch (Exception ex) {
+//
+//            result.status = 500;
+//            result.errorMessage = ex.getLocalizedMessage();
+//
+//        }
+//        return ResponseEntity.status(result.status).body(result);
+//    }
+
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody Usuario usuario) {
-        Result result = new Result();
+public ResponseEntity register(@RequestBody Usuario usuario) {
+    Result result = new Result();
 
-        try {
+    try {
+        // Guardas la contraseña cruda SOLO para el correo
+        String rawPassword = usuario.getPassword();
 
-            String rawPassword = usuario.getPassword();
+        // OJO: YA NO encriptas aquí, eso lo hace UsuarioService.CrearCuenta
+        Usuario creado = usuarioService.CrearCuenta(usuario);
 
-            usuario.setPassword(encoder.encode(rawPassword));
-            Usuario creado = usuarioService.CrearCuenta(usuario);
-
-            if (creado != null) {
-                String body = emailTemplates.registroUsuario(creado, rawPassword);
-                emailService.sendHtmlEmail(creado.getEmail(), "Registro exitoso", body);
-                result.object = "Usuario registrado. Revisa tu correo para verificar";
-                result.status = 201;
-
-            } else {
-                result.status = 400;
-                result.errorMessage = "No se pudo registrar el usuario";
-
-            }
-
-        } catch (Exception ex) {
-
-            result.status = 500;
-            result.errorMessage = ex.getLocalizedMessage();
-
+        if (creado != null) {
+            String body = emailTemplates.registroUsuario(creado, rawPassword);
+            emailService.sendHtmlEmail(creado.getEmail(), "Registro exitoso", body);
+            result.object = "Usuario registrado. Revisa tu correo para verificar";
+            result.status = 201;
+        } else {
+            result.status = 400;
+            result.errorMessage = "No se pudo registrar el usuario (email o username ya existe)";
         }
-        return ResponseEntity.status(result.status).body(result);
+
+    } catch (Exception ex) {
+        result.status = 500;
+        result.errorMessage = ex.getLocalizedMessage();
     }
 
+    return ResponseEntity.status(result.status).body(result);
+}
+
+    
+    
     @GetMapping("/verify")
     public ResponseEntity verifyAccount(@RequestParam String token) {
 
@@ -147,26 +178,24 @@ public class AuthController {
     public ResponseEntity login(@RequestBody Usuario usuario) {
         Result result = new Result();
         try {
-
             Usuario usuarioBuscar = usuarioService.BuscarPorUsuario(usuario.getUsername());
             if (usuarioBuscar == null) {
-
                 result.status = 404;
-                result.errorMessage = "usuario no encontrado";
+                result.errorMessage = "Usuario no encontrado";
                 return ResponseEntity.status(result.status).body(result);
-
             }
 
             if (!usuarioBuscar.isEnabled()) {
                 verificationService.sendActivationEmail(usuarioBuscar);
                 result.status = 403;
-                result.errorMessage = "Cuenta no activada. Se envio un correo de activacion";
+                result.errorMessage = "Cuenta no activada. Se envió un correo de activación";
                 return ResponseEntity.status(result.status).body(result);
             }
 
             Authentication auth = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(usuario.getUsername(), usuario.getPassword())
             );
+
             String token = jwtUtil.generatedToke(usuario.getUsername());
 
             Map<String, Object> response = new HashMap<>();
@@ -175,13 +204,69 @@ public class AuthController {
 
             result.object = response;
             result.status = 200;
+
         } catch (AuthenticationException ex) {
-            result.status = 401;
-            result.errorMessage = "Credenciales inválidas.";
+        result.status = 401;
+        result.errorMessage = "Credenciales inválidas";
+    } catch (Exception ex) {
+            result.status = 500;
+            result.errorMessage = "Error interno: " + ex.getMessage();
         }
         return ResponseEntity.status(result.status).body(result);
     }
 
+    
+//    @PostMapping("/login")
+//public ResponseEntity login(@RequestBody Usuario usuario) {
+//    Result result = new Result();
+//    try {
+//        // 1. Buscar usuario por username
+//        Usuario usuarioBuscar = usuarioService.BuscarPorUsuario(usuario.getUsername());
+//        if (usuarioBuscar == null) {
+//            result.status = 404;
+//            result.errorMessage = "Usuario no encontrado";
+//            return ResponseEntity.status(result.status).body(result);
+//        }
+//
+//        // 2. Validar que esté habilitado
+//        if (!usuarioBuscar.isEnabled()) {
+//            verificationService.sendActivationEmail(usuarioBuscar);
+//            result.status = 403;
+//            result.errorMessage = "Cuenta no activada. Se envió un correo de activación";
+//            return ResponseEntity.status(result.status).body(result);
+//        }
+//
+//        // 3. Comparar contraseña (cruda vs hash en BD)
+//        if (!encoder.matches(usuario.getPassword(), usuarioBuscar.getPassword())) {
+//            result.status = 401;
+//            result.errorMessage = "Credenciales inválidas";
+//            return ResponseEntity.status(result.status).body(result);
+//        }
+//
+//        // 4. Generar token
+//        String token = jwtUtil.generatedToke(usuarioBuscar.getUsername());
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("token", token);
+//        response.put("username", usuarioBuscar.getUsername());
+//
+//        result.object = response;
+//        result.status = 200;
+//
+//    } catch (Exception ex) {
+//        result.status = 500;
+//        result.errorMessage = "Error interno: " + ex.getMessage();
+//    }
+//    return ResponseEntity.status(result.status).body(result);
+//}
+
+    
+   
+
+
+    
+    
+    
     @PostMapping("/forgot")
     public ResponseEntity forgotPassword(@RequestParam String email) {
         Result result = new Result();
@@ -197,7 +282,7 @@ public class AuthController {
     }
 
     @PostMapping("/reset")
-    public ResponseEntity resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+    public ResponseEntity resetPassword( @RequestParam String token, @RequestParam String newPassword) {
         Result result = new Result();
         try {
             boolean reset = passwordResetService.resetPassword(token, newPassword);
@@ -216,33 +301,33 @@ public class AuthController {
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity changePassword(@RequestParam String username,
-            @RequestParam String newPassword) {
+public ResponseEntity changePassword(@RequestParam String username,
+                                     @RequestParam String newPassword) {
 
-        Result result = new Result();
+    Result result = new Result();
 
-        try {
-            Usuario usuario = usuarioService.BuscarPorUsuario(username);
-            if (usuario != null) {
-                usuario.setPassword(newPassword);
-                usuarioService.CrearCuenta(usuario);
-                notificationService.sendpasswordChangeNotification(usuario);
-                result.status = 200;
-                result.errorMessage = "Contraseña cambiada";
+    try {
+        Usuario usuario = usuarioService.BuscarPorUsuario(username);
+        if (usuario != null) {
+            usuarioService.cambiarPassword(.usuario, newPassword);
+            notificationService.sendpasswordChangeNotification(usuario);
 
-            } else {
-                result.status = 404;
-                result.errorMessage = "Usuario no encontrado";
+            result.status = 200;
+            result.errorMessage = "Contraseña cambiada";
 
-            }
-
-        } catch (Exception ex) {
-
-            result.status = 500;
-            result.errorMessage = ex.getLocalizedMessage();
+        } else {
+            result.status = 404;
+            result.errorMessage = "Usuario no encontrado";
         }
 
-        return ResponseEntity.status(result.status).body(result);
+    } catch (Exception ex) {
+        result.status = 500;
+        result.errorMessage = ex.getLocalizedMessage();
     }
+
+    return ResponseEntity.status(result.status).body(result);
+}
+
+
 
 }

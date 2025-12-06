@@ -33,7 +33,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String extracUsername(String token) {
+    public String extractUsername(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(Keys.hmacShaKeyFor(tokens.getBytes()))
                 .build()
@@ -45,7 +45,7 @@ public class JwtUtil {
     public boolean isValid(String token) {
         try {
 
-            extracUsername(token);
+            extractUsername(token);
             return true;
         } catch (Exception ex) {
             return false;

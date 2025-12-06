@@ -21,7 +21,7 @@ public class RestControllerUsuario {
     @Autowired
     private UsuarioService usuarioService;
 
-    @PostMapping
+    @PostMapping("/registro")
     public ResponseEntity CrearCuenta(@RequestBody Usuario usuario) {
         Result result = new Result();
         try {
