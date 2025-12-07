@@ -62,7 +62,7 @@ public class EmailTemplates {
 
     public String recuperarPassword(Usuario usuario, String token) {
 
-        String link = "http://localhost:8080/api/auth/reset?token=" + token;
+        String link = "http://localhost:8083/auth/reset?token=" + token;
         return """
                
                 <html>

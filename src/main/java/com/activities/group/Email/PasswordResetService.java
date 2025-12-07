@@ -46,11 +46,9 @@ public class PasswordResetService {
     if (idUsuario != null) {
         Usuario usuario = iUsuario.findById(idUsuario).orElse(null);
         if (usuario != null) {
-            // Guardar la contraseña cifrada en BD
             usuario.setPassword(encoder.encode(newPassword));
             iUsuario.save(usuario);
 
-            // Notificar al usuario con la nueva contraseña en texto plano
             String htmlBody = emailTemplates.resentPasswordConfirm(usuario, newPassword);
             emailService.sendHtmlEmail(usuario.getEmail(), "Tu contraseña ha sido restablecida", htmlBody);
 
