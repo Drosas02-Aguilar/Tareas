@@ -131,6 +131,8 @@ public class AuthController {
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
             response.put("username", usuario.getUsername());
+            response.put("idUsuario", usuarioBuscar.getIdUsuario());
+
 
             result.object = response;
             result.status = 200;

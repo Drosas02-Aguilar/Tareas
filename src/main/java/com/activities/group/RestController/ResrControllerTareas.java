@@ -64,6 +64,29 @@ public class ResrControllerTareas {
         return ResponseEntity.status(result.status).body(result);
     }
 
+    @GetMapping("/usuario/{idUsuario}/{idTarea}")
+    public ResponseEntity<Result> obtenerTareaPorUsuario(
+            @PathVariable int idUsuario,
+            @PathVariable int idTarea) {
+
+        Result result = new Result();
+        try {
+            Tarea tarea = tareaService.obtenerTareaPorUsuario(idUsuario, idTarea);
+            if (tarea != null) {
+                result.object = tarea;
+                result.status = 200;
+                result.errorMessage = "Tarea encontrada";
+            } else {
+                result.status = 404;
+                result.errorMessage = "Tarea no encontrada o no pertenece al usuario";
+            }
+        } catch (Exception ex) {
+            result.status = 500;
+            result.errorMessage = ex.getLocalizedMessage();
+        }
+        return ResponseEntity.status(result.status).body(result);
+    }
+
     @PutMapping("/usuario/{idUsuario}/{idTarea}")
     public ResponseEntity ActualizarTarea(@PathVariable int idUsuario, @PathVariable int idTarea, @RequestBody Tarea tareaCambios) {
         Result result = new Result();

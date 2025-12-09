@@ -55,6 +55,15 @@ public class TareaService {
         }
         return null;
     }
+    
+    public Tarea obtenerTareaPorUsuario(int idUsuario, int idTarea) {
+    Tarea tarea = iTarea.findById(idTarea).orElse(null);
+    if (tarea != null && tarea.getUsuario().getIdUsuario() == idUsuario) {
+        return tarea;
+    }
+    return null;
+}
+
 
     public Tarea EliminarTarea(int idUsuario, int IdTarea) {
         Optional<Tarea> tareaOptional = iTarea.findOwnedById(IdTarea, idUsuario);

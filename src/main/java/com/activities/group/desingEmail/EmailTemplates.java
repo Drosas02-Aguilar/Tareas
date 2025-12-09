@@ -36,7 +36,7 @@ public class EmailTemplates {
     }
 
     public String activacionCuenta(Usuario usuario, String token) {
-        String link = "http://localhost:8080/api/auth/verify?token=" + token;
+        String link = "http://localhost:8083/auth/verify?token=" + token;
         return """
             <html>
             <head>
