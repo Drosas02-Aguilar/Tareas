@@ -3,6 +3,7 @@ package com.activities.group.RestController;
 import com.activities.group.Entity.Result;
 import com.activities.group.Entity.Usuario;
 import com.activities.group.Service.UsuarioService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,8 +23,8 @@ public class RestControllerUsuario {
     private UsuarioService usuarioService;
 
     @PostMapping("/registro")
-    public ResponseEntity CrearCuenta(@RequestBody Usuario usuario) {
-        Result result = new Result();
+    public ResponseEntity<Result<Usuario>> CrearCuenta(@RequestBody Usuario usuario) {
+        Result<Usuario> result = new Result<>();
         try {
             if (usuario != null) {
                 result.object = usuarioService.CrearCuenta(usuario);
@@ -33,7 +34,6 @@ public class RestControllerUsuario {
                 result.errorMessage = "Usuario o email invalido";
             }
         } catch (Exception ex) {
-
             result.status = 500;
             result.errorMessage = ex.getLocalizedMessage();
         }
@@ -41,8 +41,8 @@ public class RestControllerUsuario {
     }
 
     @GetMapping("{idUsuario}")
-    public ResponseEntity GetUsuarioByid(@PathVariable("idUsuario") int idUsuario) {
-        Result result = new Result();
+    public ResponseEntity<Result<Usuario>> GetUsuarioByid(@PathVariable("idUsuario") int idUsuario) {
+        Result<Usuario> result = new Result<>();
         try {
             result.object = usuarioService.GetUsuarioByid(idUsuario);
             result.status = result.object != null ? 201 : 400;
@@ -56,10 +56,11 @@ public class RestControllerUsuario {
     }
 
     @GetMapping
-    public ResponseEntity ListarUsuarios() {
-        Result result = new Result();
+    public ResponseEntity<Result<Usuario>> ListarUsuarios() {
+        Result<Usuario> result = new Result<>();
         try {
-            result.object = usuarioService.ListarUsuarios();
+            List<Usuario> usuarios = usuarioService.ListarUsuarios();
+            result.objects = usuarios;
             result.status = 200;
         } catch (Exception ex) {
             result.status = 500;
@@ -69,11 +70,10 @@ public class RestControllerUsuario {
     }
 
     @GetMapping("/buscar/username/{username}")
-    public ResponseEntity BuscarPorUsuario(@PathVariable String username) {
-        Result result = new Result();
+    public ResponseEntity<Result<Usuario>> BuscarPorUsuario(@PathVariable String username) {
+        Result<Usuario> result = new Result<>();
         try {
             if (username != null) {
-
                 result.object = usuarioService.BuscarPorUsuario(username);
                 result.status = 200;
             } else {
@@ -88,8 +88,8 @@ public class RestControllerUsuario {
     }
 
     @GetMapping("/buscar/email/{email}")
-    public ResponseEntity BuscarPorEmail(@PathVariable String email) {
-        Result result = new Result();
+    public ResponseEntity<Result<Usuario>> BuscarPorEmail(@PathVariable String email) {
+        Result<Usuario> result = new Result<>();
         try {
             if (email != null) {
                 result.object = usuarioService.BuscarPorEmail(email);
@@ -106,8 +106,8 @@ public class RestControllerUsuario {
     }
 
     @PutMapping("/actualizar/{idUsuario}")
-    public ResponseEntity ActualizarUsuario(@PathVariable int idUsuario, @RequestBody Usuario usuarioUpdate) {
-        Result result = new Result();
+    public ResponseEntity<Result<Usuario>> ActualizarUsuario(@PathVariable int idUsuario, @RequestBody Usuario usuarioUpdate) {
+        Result<Usuario> result = new Result<>();
         try {
             if (usuarioUpdate != null) {
                 Usuario actualizado = usuarioService.ActualizarUsuario(idUsuario, usuarioUpdate);
@@ -129,9 +129,9 @@ public class RestControllerUsuario {
         return ResponseEntity.status(result.status).body(result);
     }
 
-    @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity EliminarUsuario(@PathVariable int idUsuario) {
-        Result result = new Result();
+    @DeleteMapping("/eliminar/{idUsuario}")
+    public ResponseEntity<Result<Usuario>> EliminarUsuario(@PathVariable int idUsuario) {
+        Result<Usuario> result = new Result<>();
         try {
             Usuario usuario = usuarioService.EliminarUsuario(idUsuario);
             if (usuario == null) {
@@ -144,7 +144,6 @@ public class RestControllerUsuario {
         } catch (Exception ex) {
             result.status = 500;
             result.errorMessage = ex.getLocalizedMessage();
-
         }
         return ResponseEntity.status(result.status).body(result);
     }
