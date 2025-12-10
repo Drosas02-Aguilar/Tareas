@@ -4,10 +4,12 @@ import com.activities.group.Entity.Result;
 import com.activities.group.Entity.Usuario;
 import com.activities.group.Service.UsuarioService;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -105,29 +107,58 @@ public class RestControllerUsuario {
         return ResponseEntity.status(result.status).body(result);
     }
 
-    @PutMapping("/actualizar/{idUsuario}")
-    public ResponseEntity<Result<Usuario>> ActualizarUsuario(@PathVariable int idUsuario, @RequestBody Usuario usuarioUpdate) {
-        Result<Usuario> result = new Result<>();
-        try {
-            if (usuarioUpdate != null) {
-                Usuario actualizado = usuarioService.ActualizarUsuario(idUsuario, usuarioUpdate);
-                if (actualizado != null) {
-                    result.object = actualizado;
-                    result.status = 200;
-                } else {
-                    result.status = 404;
-                    result.errorMessage = "Usuario no encontrado.";
-                }
-            } else {
-                result.status = 400;
-                result.errorMessage = "Datos de usuario inválidos.";
-            }
-        } catch (Exception ex) {
-            result.status = 500;
-            result.errorMessage = ex.getLocalizedMessage();
+//    @PutMapping("/actualizar/{idUsuario}")
+//    public ResponseEntity<Result<Usuario>> ActualizarUsuario(@PathVariable int idUsuario, @RequestBody Usuario usuarioUpdate) {
+//        Result<Usuario> result = new Result<>();
+//        try {
+//            if (usuarioUpdate != null) {
+//                Usuario actualizado = usuarioService.ActualizarUsuario(idUsuario, usuarioUpdate);
+//                if (actualizado != null) {
+//                    result.object = actualizado;
+//                    result.status = 200;
+//                } else {
+//                    result.status = 404;
+//                    result.errorMessage = "Usuario no encontrado.";
+//                }
+//            } else {
+//                result.status = 400;
+//                result.errorMessage = "Datos de usuario inválidos.";
+//            }
+//        } catch (Exception ex) {
+//            result.status = 500;
+//            result.errorMessage = ex.getLocalizedMessage();
+//        }
+//        return ResponseEntity.status(result.status).body(result);
+//    }
+    
+    @PatchMapping("/actualizar/{idUsuario}")
+public ResponseEntity<Result<Usuario>> ActualizarUsuarioParcial(
+        @PathVariable int idUsuario, 
+        @RequestBody Map<String, Object> cambios) {
+    
+    Result<Usuario> result = new Result<>();
+    
+    try {
+        Usuario actualizado = usuarioService.ActualizarUsuarioParcial(idUsuario, cambios);
+        
+        if (actualizado != null) {
+            result.object = actualizado;
+            result.status = 200;
+            result.errorMessage = "Usuario actualizado exitosamente";
+        } else {
+            result.status = 404;
+            result.errorMessage = "Usuario no encontrado";
         }
-        return ResponseEntity.status(result.status).body(result);
+    } catch (RuntimeException ex) {
+        result.status = 400;
+        result.errorMessage = ex.getMessage();
+    } catch (Exception ex) {
+        result.status = 500;
+        result.errorMessage = ex.getLocalizedMessage();
     }
+    
+    return ResponseEntity.status(result.status).body(result);
+}
 
     @DeleteMapping("/eliminar/{idUsuario}")
     public ResponseEntity<Result<Usuario>> EliminarUsuario(@PathVariable int idUsuario) {

@@ -4,6 +4,7 @@ import com.activities.group.DAO.ITarea;
 import com.activities.group.DAO.IUsuario;
 import com.activities.group.Entity.Usuario;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,21 +62,58 @@ public class UsuarioService {
 
     }
 
+//    @Transactional
+//    public Usuario ActualizarUsuario(int idUsuario, Usuario usuarioUpdate) {
+//        Optional<Usuario> usuarioPtional = iUsuario.findById(idUsuario);
+//        if (usuarioPtional.isPresent()) {
+//            Usuario usuario = usuarioPtional.get();
+//            usuario.setNombre(usuarioUpdate.getNombre());
+//            usuario.setUsername(usuarioUpdate.getUsername());
+//            usuario.setEmail(usuarioUpdate.getEmail());
+//if (usuarioUpdate.getPassword() != null && !usuarioUpdate.getPassword().isBlank()) {
+//                usuario.setPassword(encoder.encode(usuarioUpdate.getPassword()));
+//            }            iUsuario.save(usuario);
+//            return usuario;
+//        }
+//        return null;
+//    }
     @Transactional
-    public Usuario ActualizarUsuario(int idUsuario, Usuario usuarioUpdate) {
-        Optional<Usuario> usuarioPtional = iUsuario.findById(idUsuario);
-        if (usuarioPtional.isPresent()) {
-            Usuario usuario = usuarioPtional.get();
-            usuario.setNombre(usuarioUpdate.getNombre());
-            usuario.setUsername(usuarioUpdate.getUsername());
-            usuario.setEmail(usuarioUpdate.getEmail());
-if (usuarioUpdate.getPassword() != null && !usuarioUpdate.getPassword().isBlank()) {
-                usuario.setPassword(encoder.encode(usuarioUpdate.getPassword()));
-            }            iUsuario.save(usuario);
-            return usuario;
+   public Usuario ActualizarUsuarioParcial(int idUsuario, Map<String, Object> cambios) {
+    Optional<Usuario> usuarioOpt = iUsuario.findById(idUsuario);
+    
+    if (usuarioOpt.isPresent()) {
+        Usuario usuario = usuarioOpt.get();
+        
+        // Actualizar solo los campos que vienen en el Map
+        if (cambios.containsKey("nombre") && cambios.get("nombre") != null) {
+            usuario.setNombre((String) cambios.get("nombre"));
         }
-        return null;
+        
+        if (cambios.containsKey("username") && cambios.get("username") != null) {
+            String newUsername = (String) cambios.get("username");
+            // Verificar que el username no esté en uso por otro usuario
+            Optional<Usuario> existenteOpt = iUsuario.findByUsername(newUsername);
+            if (existenteOpt.isPresent() && existenteOpt.get().getIdUsuario() != idUsuario) {
+                throw new RuntimeException("El nombre de usuario ya está en uso");
+            }
+            usuario.setUsername(newUsername);
+        }
+        
+        if (cambios.containsKey("email") && cambios.get("email") != null) {
+            String newEmail = (String) cambios.get("email");
+            // Verificar que el email no esté en uso por otro usuario
+            Optional<Usuario> existenteOpt = iUsuario.findByEmail(newEmail);
+            if (existenteOpt.isPresent() && existenteOpt.get().getIdUsuario() != idUsuario) {
+                throw new RuntimeException("El correo electrónico ya está en uso");
+            }
+            usuario.setEmail(newEmail);
+        }
+        
+        return iUsuario.save(usuario);
     }
+    
+    return null;
+}
 
     @Transactional
     public Usuario EliminarUsuario(int IdUsusario) {
