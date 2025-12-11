@@ -76,4 +76,17 @@ public class TareaService {
         }
         return null;
     }
+    
+    public Tarea ActualizarEstado(int idUsuario, int idTarea, Tarea.EstadoTarea nuevoEstado){
+   Optional<Tarea> tareaOptional = iTarea.findOwnedById(idTarea, idUsuario);
+   
+   if(tareaOptional.isPresent()){
+    Tarea tarea = tareaOptional.get();
+    tarea.setEstado(nuevoEstado);
+    iTarea.save(tarea);
+    return tarea;
+    }
+    return null;
+    }
+    
 }

@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/verify",
                         "/api/auth/forgot",
                         "/api/auth/reset", "/api/auth/change-password","/api/usuario/**",
-                "/api/tareas/**", "/auth/**").permitAll()
+                "/api/tareas/**", "/auth/**", "/api/usuario/**").permitAll()
                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

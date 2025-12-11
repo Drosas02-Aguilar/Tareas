@@ -84,14 +84,12 @@ public class UsuarioService {
     if (usuarioOpt.isPresent()) {
         Usuario usuario = usuarioOpt.get();
         
-        // Actualizar solo los campos que vienen en el Map
         if (cambios.containsKey("nombre") && cambios.get("nombre") != null) {
             usuario.setNombre((String) cambios.get("nombre"));
         }
         
         if (cambios.containsKey("username") && cambios.get("username") != null) {
             String newUsername = (String) cambios.get("username");
-            // Verificar que el username no esté en uso por otro usuario
             Optional<Usuario> existenteOpt = iUsuario.findByUsername(newUsername);
             if (existenteOpt.isPresent() && existenteOpt.get().getIdUsuario() != idUsuario) {
                 throw new RuntimeException("El nombre de usuario ya está en uso");
@@ -101,7 +99,6 @@ public class UsuarioService {
         
         if (cambios.containsKey("email") && cambios.get("email") != null) {
             String newEmail = (String) cambios.get("email");
-            // Verificar que el email no esté en uso por otro usuario
             Optional<Usuario> existenteOpt = iUsuario.findByEmail(newEmail);
             if (existenteOpt.isPresent() && existenteOpt.get().getIdUsuario() != idUsuario) {
                 throw new RuntimeException("El correo electrónico ya está en uso");
