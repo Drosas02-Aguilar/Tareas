@@ -130,49 +130,55 @@ public class RestControllerTareas {
     }
 
     
-     @PatchMapping("/usuario/{idUsuario}/{idTarea}/estado")
-    public ResponseEntity<Result<Tarea>> CambiarEstado(
-            @PathVariable int idUsuario, 
-            @PathVariable int idTarea, 
-            @RequestBody Map<String, String> request) {
-        
-        Result<Tarea> result = new Result<>();
-        
-        try {
-            String nuevoEstadoStr = request.get("estado");
-            
-            if (nuevoEstadoStr == null || nuevoEstadoStr.isEmpty()) {
-                result.status = 400;
-                result.errorMessage = "Estado no proporcionado";
-                return ResponseEntity.status(result.status).body(result);
-            }
-            
-            Tarea.EstadoTarea nuevoEstado;
-            try {
-                nuevoEstado = Tarea.EstadoTarea.valueOf(nuevoEstadoStr);
-            } catch (IllegalArgumentException e) {
-                result.status = 400;
-                result.errorMessage = "Estado inválido: " + nuevoEstadoStr;
-                return ResponseEntity.status(result.status).body(result);
-            }
-            
-            Tarea tareaActualizada = tareaService.ActualizarEstado(idUsuario, idTarea, nuevoEstado);
-            
-            if (tareaActualizada != null) {
-                result.object = tareaActualizada;
-                result.status = 200;
-                result.errorMessage = "Estado actualizado correctamente";
-            } else {
-                result.status = 404;
-                result.errorMessage = "Tarea no encontrada o no pertenece al usuario";
-            }
-            
-        } catch (Exception ex) {
-            result.status = 500;
-            result.errorMessage = ex.getLocalizedMessage();
+    @PatchMapping("/usuario/{idUsuario}/{idTarea}/estado")
+public ResponseEntity<Result<Tarea>> CambiarEstado(
+        @PathVariable int idUsuario,
+        @PathVariable int idTarea,
+        @RequestBody Map<String, String> request) {
+
+    Result<Tarea> result = new Result<>();
+
+    try {
+        String nuevoEstadoStr = request.get("estado");
+
+        if (nuevoEstadoStr == null || nuevoEstadoStr.isEmpty()) {
+            result.status = 400;
+            result.errorMessage = "Estado no proporcionado";
+            return ResponseEntity.status(result.status).body(result);
         }
-        
-        return ResponseEntity.status(result.status).body(result);
+
+        Tarea.EstadoTarea nuevoEstado = null;
+        for (Tarea.EstadoTarea estado : Tarea.EstadoTarea.values()) {
+            if (estado.name().equalsIgnoreCase(nuevoEstadoStr)) {
+                nuevoEstado = estado;
+                break;
+            }
+        }
+
+        if (nuevoEstado == null) {
+            result.status = 400;
+            result.errorMessage = "Estado inválido: " + nuevoEstadoStr;
+            return ResponseEntity.status(result.status).body(result);
+        }
+
+        Tarea tareaActualizada = tareaService.ActualizarEstado(idUsuario, idTarea, nuevoEstado);
+
+        if (tareaActualizada != null) {
+            result.object = tareaActualizada;
+            result.status = 200;
+            result.errorMessage = "Estado actualizado correctamente";
+        } else {
+            result.status = 404;
+            result.errorMessage = "Tarea no encontrada o no pertenece al usuario";
+        }
+
+    } catch (Exception ex) {
+        result.status = 500;
+        result.errorMessage = ex.getLocalizedMessage();
     }
+
+    return ResponseEntity.status(result.status).body(result);
+}
+
     
 }

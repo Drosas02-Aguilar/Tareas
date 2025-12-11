@@ -36,7 +36,7 @@ public class EmailTemplates {
     }
 
     public String activacionCuenta(Usuario usuario, String token) {
-        String link = "http://192.167.2.34:8083/auth/verify?token=" + token;
+        String link = "http://192.167.0.75:8083/auth/verify?token=" + token;
         return """
             <html>
             <head>
@@ -62,7 +62,7 @@ public class EmailTemplates {
 
     public String recuperarPassword(Usuario usuario, String token) {
 
-        String link = "http://192.167.2.34:8083/auth/reset?token=" + token;
+        String link = "http://192.167.0.75:8083/auth/reset?token=" + token;
         return """
                
                 <html>
